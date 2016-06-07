@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="imu3_simple">
+
+	<xacro:property name="pi" value="3.1415926535897931" />
+	<xacro:property name="velocity" value="100" />
+	<xacro:property name="effort" value="100" />
+
+	<xacro:include filename="$(find imu3_description)/model/materials.urdf.xacro"/>
+	
+
+	<xacro:include filename="$(find imu3_description)/model/imu.urdf.xacro"/>
+
+
+	<link name="world">
+		 <!-- <inertial>
+		 <mass value="1"/>
+            <inertia ixx="0.13" iyy="0.524" izz="0.539" ixy="0" ixz="0" iyz="0" />
+            </inertial>
+		<visual>
+			<origin xyz="0 0 0.25" rpy="0 0 0"/>
+			<geometry>
+				<box size="0.5 0.5 0.5"/>
+			</geometry> -->
+			<!-- <material name="LightGrey" /> -->
+		<!-- </visual>
+		<collision>
+                <geometry>
+				<box size="0.5 0.5 0.5"/>
+                </geometry>
+            </collision>   -->
+	</link>
+
+	<xacro:imu parent="world" name="imu" position="0 0 0" orientation="0 0 0" />
+	
+
+</robot>

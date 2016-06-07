@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+
+	<xacro:property name="pi" value="3.1415926535897931" />
+	<xacro:property name="velocity" value="100" />
+	<xacro:property name="effort" value="100" />
+
+
+
+	<!-- macro for 3 IMU -->
+	<xacro:macro name="imu" params="parent name position orientation">
+		<joint name="${name}_first_joint_roll" type="revolute">
+			<origin xyz="${position}" rpy="${orientation}" />
+			<parent link="${parent}"/>
+			<child link="${name}_first_link_roll"/>
+					<axis xyz="1 0 0" />
+				<limit lower="${0}" upper="${2*pi}" effort="${effort}" velocity="${velocity}"/>
+			</joint>
+		<link name="${name}_first_link_roll">
+		</link>
+
+		<joint name="${name}_first_joint_pitch" type="revolute">
+			<origin xyz="0 0 0" rpy="0 0 0" />
+			<parent link="${name}_first_link_roll"/>
+			<child link="${name}_first_link_pitch"/>
+					<axis xyz="0 1 0" />
+					<limit lower="${0}" upper="${2*pi}" effort="${effort}" velocity="${velocity}"/>
+			</joint>
+		<link name="${name}_first_link_pitch">
+		</link>
+
+		<joint name="${name}_first_joint_yaw" type="revolute">
+			<origin xyz="0 0 0" rpy="0 0 0" />
+			<parent link="${name}_first_link_pitch"/>
+			<child link="${name}_first_link_yaw"/>
+				<axis xyz="0 0 1" />
+				<limit lower="${0}" upper="${2*pi}" effort="${effort}" velocity="${velocity}"/>
+		</joint>
+		<link name="${name}_first_link_yaw">
+			<visual>
+				<origin xyz="0 0 0" rpy="0 0 0"/>
+				<geometry>
+					<box size="0.05 0.05 0.01"/>
+				</geometry>
+				<material name="Red" />
+			</visual>
+		</link>	
+
+
+		<joint name="${name}_second_joint_roll" type="revolute">
+			<origin xyz="0 0.1 0 " rpy="${orientation}" />
+			<parent link="${name}_first_link_yaw"/>
+			<child link="${name}_second_link_roll"/>
+					<axis xyz="1 0 0" />
+				<limit lower="${0}" upper="${2*pi}" effort="${effort}" velocity="${velocity}"/>
+			</joint>
+		<link name="${name}_second_link_roll">
+		</link>
+
+		<joint name="${name}_second_joint_pitch" type="revolute">
+			<origin xyz="0 0 0" rpy="0 0 0" />
+			<parent link="${name}_second_link_roll"/>
+			<child link="${name}_second_link_pitch"/>
+					<axis xyz="0 1 0" />
+					<limit lower="${0}" upper="${2*pi}" effort="${effort}" velocity="${velocity}"/>
+			</joint>
+		<link name="${name}_second_link_pitch">
+		</link>
+
+		<joint name="${name}_second_joint_yaw" type="revolute">
+			<origin xyz="0 0 0" rpy="0 0 0" />
+			<parent link="${name}_second_link_pitch"/>
+			<child link="${name}_second_link_yaw"/>
+				<axis xyz="0 0 1" />
+				<limit lower="${0}" upper="${2*pi}" effort="${effort}" velocity="${velocity}"/>
+		</joint>
+		<link name="${name}_second_link_yaw">
+			<visual>
+				<origin xyz="0 0 0" rpy="0 0 0"/>
+				<geometry>
+					<box size="0.05 0.05 0.01"/>
+				</geometry>
+				<material name="Blue" />
+			</visual>
+		</link>	
+
+
+
+		<joint name="${name}_third_joint_roll" type="revolute">
+			<origin xyz="0 0.1 0 " rpy="${orientation}" />
+			<parent link="${name}_second_link_yaw"/>
+			<child link="${name}_third_link_roll"/>
+					<axis xyz="1 0 0" />
+				<limit lower="${0}" upper="${2*pi}" effort="${effort}" velocity="${velocity}"/>
+			</joint>
+		<link name="${name}_third_link_roll">
+		</link>
+
+		<joint name="${name}_third_joint_pitch" type="revolute">
+			<origin xyz="0 0 0" rpy="0 0 0" />
+			<parent link="${name}_third_link_roll"/>
+			<child link="${name}_third_link_pitch"/>
+					<axis xyz="0 1 0" />
+					<limit lower="${0}" upper="${2*pi}" effort="${effort}" velocity="${velocity}"/>
+			</joint>
+		<link name="${name}_third_link_pitch">
+		</link>
+
+		<joint name="${name}_third_joint_yaw" type="revolute">
+			<origin xyz="0 0 0" rpy="0 0 0" />
+			<parent link="${name}_third_link_pitch"/>
+			<child link="${name}_third_link_yaw"/>
+				<axis xyz="0 0 1" />
+				<limit lower="${0}" upper="${2*pi}" effort="${effort}" velocity="${velocity}"/>
+		</joint>
+		<link name="${name}_third_link_yaw">
+			<visual>
+				<origin xyz="0 0 0" rpy="0 0 0"/>
+				<geometry>
+					<box size="0.05 0.05 0.01"/>
+				</geometry>
+				<material name="LightBlue" />
+			</visual>
+		</link>	
+
+
+
+
+
+
+
+	</xacro:macro> <!-- end xacro for one IMU -->
+
+
+
+
+</robot>
