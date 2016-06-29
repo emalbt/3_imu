@@ -23,14 +23,12 @@
 */
 
 #include "IMUGL.h"
-#include <boost/date_time/posix_time/posix_time.hpp>
-
-
 
 
 
 // ============================================================================ Constructor#2
 IMUGL::IMUGL()
+// IMUGL::IMUGL(psocVariables p_constructor, bool flag)
 {
 	/********************
 	*					*
@@ -72,7 +70,7 @@ IMUGL::IMUGL()
 IMUGL::~IMUGL()
 {
 	//nothing to be done
-	std::cout << "\n\n\nSONO FUORI \n\n\n";
+	std::cout << "\n\n\nSHUTDOWN\n\n\n";
 }
 
 
@@ -101,20 +99,16 @@ void IMUGL::initPSoC()
 	Gyro_Bias_.resize(p_.nIMU,3);
 	Gyro_Bias_.setZero();
 	IMUs_Angles_.resize(p_.nIMU,3);
-	IMUs_Angles_old_.resize(p_.nIMU,3);
-	Mag_.resize(p_.nIMU,3);
-	COM_.resize(p_.nIMU,3);
-	// MagCal_.resize(p_.nIMU,3);
-	MagCal_.resize(17,3);
+	Q_.resize(p_.nIMU,4);
+	count_IMU_Failure_.resize(p_.nIMU);
 
 	z_.betaVector.resize(p_.nIMU);
 	count_ = 0;
 
-	// Initialize manikin quaternion matrix   
+	// Initialize glove quaternion matrix   
 	Q_.resize(p_.nIMU, 4);
 	Q_joint_.resize(p_.nIMU,4);
 	Q_off_.resize(p_.nIMU,4);
-	Q_world_.resize(p_.nIMU,4);
 	for( int i = 0; i < p_.nIMU; ++i)
 	{
 	    for( int j = 0; j < 4; ++j)
@@ -122,61 +116,16 @@ void IMUGL::initPSoC()
 	    	Q_(i,j) = 0;
 	    	Q_off_(i,j) = 0;
 	    	Q_joint_(i,j) = 0;
-	    	Q_world_(i,j) = 0;
 	    	if( j==0 )
 	    	{
 	    		Q_(i,j) = 1;
 	        	Q_off_(i,j) = 1;
 	        	Q_joint_(i,j) = 1;
-	        	Q_world_(i,j) = 1;
 	    	}
 	    }
 
 	    z_.betaVector(i) = 2; 
 	}
-
-	Quaternion(0) = 1;
-	Quaternion(1) = 0;
-	Quaternion(2) = 0;
-	Quaternion(3) = 0;
-
-	/********************
-	*					*
-	*	    MAG CAL		*
-	*					*
-	********************/
-	// MAG CAL initialize         							
-	MagCal_ << 	181, 181, 169,	 
-				174, 175, 163,	 
-				175, 174, 163,	 
-				176, 179, 166,	 
-				181, 183, 170,	 
-				177, 178, 166,	 
-				170, 173, 159,	 
-				170, 172, 159,	 
-				177, 178, 167,	 
-				176, 178, 166,	
-				177, 177, 165,	 
-				176, 177, 164,	        
-				179, 179, 168,
-				174, 174, 162,	 
-				182, 183, 170,	        
-				171, 169, 158,
- 				178, 180, 168;	
-	/********************
-	*					*
-	*	    MAG CAL		*
-	*					*
-	********************/
-				
-	for (int i=0 ; i<p_.nIMU; i++)
-	{
-		for (int j=0; j<3; j++)
-		{
-			MagCal_(i,j) =  (( (MagCal_(i,j) -128)*0.5 ) /128) + 1;
-		}
-	}
-
 
 
 	// Init Communication
@@ -195,14 +144,44 @@ void IMUGL::initPSoC()
 
 	tcflush(serialPort_->lowest_layer().native_handle(), TCIOFLUSH);
 
-	std::cout << "\n\n\r\033[32m\033[1m[IMUGL] initPSoC: Communication Established\033[0m\r" << std::endl;
-	
+	// int sizestartBuffer = 1;
+	// uint8_t* startBuffer;
+	// bool f = true;
+
+	std::cout<< "\r\nCOMMUNICATION ESTABLISHED WITH THE PSOC5 \n";
+	// wait PSCO		
+	// while(f)
+	// {
+		// boost::asio::write(*serialPort_,boost::asio::buffer(new char('r'),1));
+		// sleep(3);
+	// 	boost::asio::read(*serialPort_, boost::asio::buffer(startBuffer, sizestartBuffer));
+	// 	std::cout <<"startBuffer " << (int) startBuffer[0] << "\r\n" 
+	// 	if (startBuffer == 255)
+	// 		f = false;
+	// }
+
+	 // char*   port; 
+  //   // baudRate 
+  //   int     baudRate;
+  //   // # of IMU connected
+  //   int     nIMU;
+  //   // buffer size for one IMU
+  //   int     byteIMU;   
 
 	std::cout << "p_.port: " << p_.port <<std::endl;
 	std::cout << "p_.baudRate: " << p_.baudRate<<std::endl;
 	std::cout << "p_.nIMU: " << p_.nIMU <<std::endl;
 	std::cout << "p_.byteIMU: " << p_.byteIMU <<std::endl;
 
+
+
+	boost::asio::write(*serialPort_,boost::asio::buffer(new char('?'),1));
+	boost::asio::streambuf dataStreamBuf;
+	boost::asio::read_until(*serialPort_,dataStreamBuf,'\n');		
+	std::string strData(boost::asio::buffer_cast<const char*>(dataStreamBuf.data()));
+	std::vector<std::string> strSensorData;//sensor data in string format
+	boost::split(strSensorData, strData, boost::is_any_of("\n"));
+	std::cout << "Firmware Version: " << strData << std::endl;
     getchar();
 
 	readPSoC();
@@ -210,72 +189,15 @@ void IMUGL::initPSoC()
 	Gyro_Bias_ = Gyro_;
 }
 
+
 // =============================================================================================
 //																						InitPSoC
 // =============================================================================================
 void IMUGL::stopPSoC()
 {
-	std::cout << "\n\n\r\033[31m\033[1m[IMUGL] stopPSoC: STOP COMMUNICATION\033[0m\r\n\n" << std::endl;
+	std::cout<< "\r\n\nSTOP COMMUNICATION\n";
+	// boost::asio::write(*serialPort_,boost::asio::buffer(new char('r'),1));
 	serialPort_->close();
-}
-
-
-// =============================================================================================
-//																				    Init Compass
-// =============================================================================================
-void IMUGL::initCompass(std::string path)
-{
-	cf_.resize(p_.nIMU, 6);
-	
-	if(boost::filesystem::is_regular_file(path + "Matrix_Corrector_Factors.txt"))
-	{
-		FILE *MCFfile = fopen( (path + "Matrix_Corrector_Factors.txt").c_str() ,"r");
-
-		for(int i=0; i<p_.nIMU; i++ )
-			fscanf(MCFfile, "%f\t%f\t%f\t%f\t%f\t%f\n", &cf_(i,0),&cf_(i,1),&cf_(i,2),&cf_(i,3),&cf_(i,4),&cf_(i,5) );
-
-		fclose(MCFfile);
-		std::cout << "\n\n\r\033[32m\033[1m[IMUGL] initCompass: Matrix_Corrector_Factors.txt  LOADED\033[0m \r" << std::endl;
-	}
-	else
-	{	
-
-		for(int i=0; i<p_.nIMU; i++ )
-		{
-			// offset
-			cf_(i,0) = 0;
-			cf_(i,1) = 0;
-			cf_(i,2) = 0;
-			// gain
-			cf_(i,3) = 1;
-			cf_(i,4) = 1;
-			cf_(i,5) = 1;
-		}
-
-		std::cout << "\n\n\r\033[33m\033[1m[IMUGL] initCompass: Matrix_Corrector_Factors.txt   NOT LOADED\033[0m \r" << std::endl;
-	}
-}
-
-
-
-
-// =============================================================================================
-//																				   Mag Corrector
-// =============================================================================================
-void IMUGL::magCorrector()
-{
-	Eigen::Vector3d tmp;
-
-	for (int i=0; i<p_.nIMU; i++)
-	{
-		tmp(0) = cf_(i,3) * (  Mag_(i,0) - cf_(i,0) );	
-		tmp(1) = cf_(i,4) * (  Mag_(i,1) - cf_(i,1) );	
-		tmp(2) = cf_(i,5) * (  Mag_(i,2) - cf_(i,2) );	
-
-		Mag_(i,0) = tmp(0);
-		Mag_(i,1) = tmp(1);
-		Mag_(i,2) = tmp(2);
-	}
 }
 
 
@@ -284,8 +206,15 @@ void IMUGL::magCorrector()
 // =============================================================================================
 void IMUGL::readPSoC()
 {
+	// IMU glove
 	// read serial port buffer
 	boost::asio::write(*serialPort_,boost::asio::buffer(new char('<'),1));
+	// boost::asio::write(*serialPort_,boost::asio::buffer(new char('\r'),1));
+	// boost::asio::write(*serialPort_,boost::asio::buffer(new char('\n'),1));
+
+	// IMUKUKA
+	// boost::asio::write(*serialPort_,boost::asio::buffer(new char('?'),1));
+
 	boost::asio::read(*serialPort_, boost::asio::buffer(dataBuffer_, sizeBuffer_));
 
 	if (_DEBUG_DATA_BUFFER_)
@@ -299,13 +228,11 @@ void IMUGL::readPSoC()
 	// record data in the Matrix
 	int16_t		acc [p_.nIMU][3];
 	int16_t		gyro[p_.nIMU][3];
-	int16_t		mag[p_.nIMU][3];
 
-	int 		rateAcc = 2;
+	int 		rateAcc = 1;
 	float 		scaleAccFactor  = 0.000061037 * rateAcc;  // *2  = form 2g to 4g  
 	int 		rateGyro = 8;
 	float 		scaleGyroFactor = 0.007629627 * rateGyro; // " *8 " = from 250°/s to 2000°/s;
-	float 		scaleMagFactor  = 0.1465;
 
 	// scaleAccFactor = 1;
 	// scaleGyroFactor= 1;
@@ -321,10 +248,7 @@ void IMUGL::readPSoC()
         gyro[i][1] = (dataBuffer_[9 +(p_.byteIMU*i)]<<8 | dataBuffer_[10+(p_.byteIMU*i)]);
         gyro[i][2] = (dataBuffer_[11+(p_.byteIMU*i)]<<8 | dataBuffer_[12+(p_.byteIMU*i)]);
         
-	    mag[i][0] = (dataBuffer_[13 +(p_.byteIMU*i)]<<8 | dataBuffer_[14 +(p_.byteIMU*i)]);
-        mag[i][1] = (dataBuffer_[15 +(p_.byteIMU*i)]<<8 | dataBuffer_[16 +(p_.byteIMU*i)]);
-        mag[i][2] = (dataBuffer_[17 +(p_.byteIMU*i)]<<8 | dataBuffer_[18+(p_.byteIMU*i)]);
-
+	
         Acc_(i,0) = (double)  acc[i][0] * scaleAccFactor;
         Acc_(i,1) = (double)  acc[i][1] * scaleAccFactor;
         Acc_(i,2) = (double)  acc[i][2] * scaleAccFactor;
@@ -337,32 +261,16 @@ void IMUGL::readPSoC()
         Gyro_(i,1) -= Gyro_Bias_(i,1);
         Gyro_(i,2) -= Gyro_Bias_(i,2);
 
-		Eigen::Vector3d Mag_tmp;
-        Mag_tmp(0) = (double)  mag[i][0] * scaleMagFactor * MagCal_(i,0);
-        Mag_tmp(1) = (double)  mag[i][1] * scaleMagFactor * MagCal_(i,1);
-        Mag_tmp(2) = (double)  mag[i][2] * scaleMagFactor * MagCal_(i,2);
-
-        // Mag_tmp = Mag_tmp/Mag_tmp.norm();
-
-        // Mag_tmp = rotZ(-90) * rotX(180) * Mag_tmp;        
-		Mag_(i,0) = -Mag_tmp(1);
-        Mag_(i,1) = -Mag_tmp(0);
-        Mag_(i,2) = Mag_tmp(2);
-
-        
         if(_DEBUG_REAL_DATA_)
         {
-        	// std::cout << i <<"  acc:\t\t" << Acc_(i,0) << "\t" << Acc_(i,1) << "\t" << Acc_(i,2)<<"\r\n"; 
-        	// std::cout << " " <<"  gyro:\t" << Gyro_(i,0) << "\t" << Gyro_(i,1) << "\t" << Gyro_(i,2)<<"\r\n";
-        	// std::cout << i << " " <<"  mag:\t" << Mag_(i,0) << "\t" << Mag_(i,1) << "\t" << Mag_(i,2)<<"\r\n";
+        	std::cout << i <<"  acc:\t\t" << Acc_(i,0) << "\t" << Acc_(i,1) << "\t" << Acc_(i,2)<<"\r\n"; 
+        	std::cout << " " <<"  gyro:\t" << Gyro_(i,0) << "\t" << Gyro_(i,1) << "\t" << Gyro_(i,2)<<"\r\n";
         }
 	}
 
-    magCorrector();
-
 	if(_DEBUG_REAL_DATA_)
 	{
-		std::cout <<"\n\n";
+		// std::cout <<"\n\n";
 	}
 }
 
@@ -373,7 +281,7 @@ void IMUGL::readPSoC()
 // =============================================================================================
 //																				 MadgwickGeneral
 // =============================================================================================
-void IMUGL::Magdwick(int P, int N)
+void IMUGL::MadgwickGeneral(int P, int N)
 {
 	//come N vede P;  N è il mio d (wordl), P è il mio s (sensor)
 	// ad esempio N=imu1, P=imu0, quindi come la IMU 1 vede la IMU 0 
@@ -385,21 +293,16 @@ void IMUGL::Magdwick(int P, int N)
     float dx, dy, dz;
     float sx, sy, sz;
 
-    Eigen::Vector3d aP, aN, mP, mN;
+
+    Eigen::Vector3d aP, aN, gPpartial, gNpartial;
     Eigen::Vector4d gP, gN, g, qL;
 
-    Eigen::Vector3d fa, fm;
-    Eigen::VectorXd f(6);
+    Eigen::Vector3d fa;
     Eigen::MatrixXd Ja(3,4); 
-    Eigen::MatrixXd Jm(3,4); 
-    Eigen::MatrixXd Jtot(6,4); 
     Eigen::Vector4d  qdot;
 
    	Eigen::Vector4d Napla;
 
-	/************************
-	*	    READ  DATA		*
-	*************************/
 	aP(0)  = Acc_(P,0);  
 	aP(1)  = Acc_(P,1);  
 	aP(2)  = Acc_(P,2);
@@ -407,22 +310,13 @@ void IMUGL::Magdwick(int P, int N)
 	aN(0)  = Acc_(N,0);  
 	aN(1)  = Acc_(N,1);  
 	aN(2)  = Acc_(N,2);
-	
-	mP(0)  =  Mag_(P,0);  
-	mP(1)  =  Mag_(P,1);  
-	mP(2)  =  Mag_(P,2);
 
-	mN(0)  =  Mag_(N,0);  
-	mN(1)  =  Mag_(N,1);  
-	mN(2)  =  Mag_(N,2);
-
-	mP = mP / mP.norm();
-	mN = mN / mN.norm();
+	// aN(0)  = 0;  
+	// aN(1)  = 0;  
+	// aN(2)  = 1;
  	
  	aP = aP / aP.norm();
 	aN = aN / aN.norm();
-
-	
 
 	gP(0)  = 0; 
 	gP(1)  = Gyro_(P,0);  
@@ -430,114 +324,60 @@ void IMUGL::Magdwick(int P, int N)
 	gP(3)  = Gyro_(P,2);
 
     gN(0)  = 0; 
-  	gN(1)  = Gyro_(N,0);  
-	gN(2)  = Gyro_(N,1);  
-	gN(3)  = Gyro_(N,2);
-	
+    gN(1)  = Gyro_(N,0);  
+    gN(2)  = Gyro_(N,1);  
+    gN(3)  = Gyro_(N,2);
+
+    // gN(0)  = 0; 
+    // gN(1)  = 0;  
+    // gN(2)  = 0;  
+    // gN(3)  = 0;
+
 	gP = gP*(M_PI/180);
 	gN = gN*(M_PI/180);
 
-	
 	//qL local quaternion
 	qL << Q_(P,0), Q_(P,1), Q_(P,2), Q_(P,3); 
-	
-	g = QxQ(ConjQ(qL), QxQ(qL, gP)) - gN;	
-	// g = QxQ(QxQ(qL, gP), ConjQ(qL)) - gN;	
-
-
- 
-	if (P==999)
-	{
-			// Eigen::Vector4d gdeg;
-			// gdeg = g * 180 / M_PI;
-		// std::cout << P <<"gdeg :\t\t" << gdeg(0) << "\t\t" << gdeg(1) << "\t" << gdeg(2) << "\t" << gdeg(3)<<"\r\n"; 
-		std::cout << P <<"  acc:\t\t" << aP(0) << "\t" << aP(1) << "\t" << aP(2)<<"\r\n"; 
-        std::cout << P << " " <<"  mag:\t" << mP(0) << "\t" << mP(1) << "\t" << mP(2) <<"\r\n";
-		std::cout << N <<"  acc:\t\t" << aN(0) << "\t" << aN(1) << "\t" << aN(2)<<"\r\n"; 
-       	std::cout << N << " " <<"  mag:\t" << mN(0) << "\t" << mN(1) << "\t" << mN(2)<<"\r\n";
-	}
-
 
 	q1 = qL(0);  
 	q2 = qL(1); 
 	q3 = qL(2); 
 	q4 = qL(3);
 
-	/****************************
-	*	    ACC JACOBIAN		*
-	*****************************/
+	// rotate the angular velocity
+	g = QxQ(QxQ(qL, gP), ConjQ(qL)) - gN;	
+
+	//accelerometer
 	dx = aN(0); 
 	dy = aN(1); 
 	dz = aN(2); 
 	
 	sx = aP(0); 
 	sy = aP(1); 
-	sz = aP(2); 
-	
+	sz = aP(2); 	
+
 	fa(0) =  2*dx*(0.5 -q3*q3 -q4*q4) + 2*dy*(q1*q4 + q2*q3) + 2*dz*(q2*q4-q1*q3) - sx; 
 	fa(1) =  2*dx*(q2*q3 -q1*q4) + 2*dy*(0.5 - q2*q2 - q4*q4) + 2*dz*(q1*q2 + q3*q4) - sy;
 	fa(2) =  2*dx*(q1*q3 -q2*q4) + 2*dy*(q3*q4 - q1*q2) + 2*dz*(0.5 - q2*q2 -q3*q3) - sz; 
-	
+
+	// Compute the Jacobian
 	Ja << 2*dy*q4-2*dz*q3,    2*dy*q3+2*dz*q4 ,        -4*dx*q3+2*dy*q2-2*dz*q1,  -4*dx*q4+2*dy*q1+2*dz*q2,
 		  -2*dx*q4+2*dz*q2,   2*dx*q3-4*dy*q2+2*dz*q1, 2*dx*q2+2*dz*q4,           -2*dx*q1-4*dy*q4+2*dz*q3,
 		  2*dx*q3-2*dy*q2,    2*dx*q4-2*dy*q1-4*dz*q2, 2*dx*q1+2*dy*q4-4*dz*q3,   2*dx*q2+2*dy*q3;
 
-  	// Napla = Ja.transpose() * fa;
+	// Compute the Napla
+  	Napla = Ja.transpose() * fa;
+				    
+	qdot = 0.5*QxQ( qL,g ) - ( z_.betaVector(P)*Napla );					// XXX VERIFICARE QUESTO MEGLIO 
 
-	/****************************
-	*	    MAG JACOBIAN		*
-	*****************************/
-	dx = mN(0); 
-	dy = mN(1); 
-	dz = mN(2); 
-	
-	sx = mP(0); 
-	sy = mP(1); 
-	sz = mP(2); 
-   
-	fm(0) =  2*dx*(0.5 -q3*q3 -q4*q4) + 2*dy*(q1*q4 + q2*q3) + 2*dz*(q2*q4-q1*q3) - sx; 
-	fm(1) =  2*dx*(q2*q3 -q1*q4) + 2*dy*(0.5 - q2*q2 - q4*q4) + 2*dz*(q1*q2 + q3*q4) - sy;
-	fm(2) =  2*dx*(q1*q3 -q2*q4) + 2*dy*(q3*q4 - q1*q2) + 2*dz*(0.5 - q2*q2 -q3*q3) - sz; 
-	 
-
-	Jm << 2*dy*q4-2*dz*q3,    2*dy*q3+2*dz*q4 ,        -4*dx*q3+2*dy*q2-2*dz*q1,  -4*dx*q4+2*dy*q1+2*dz*q2,
-		  -2*dx*q4+2*dz*q2,   2*dx*q3-4*dy*q2+2*dz*q1, 2*dx*q2+2*dz*q4,           -2*dx*q1-4*dy*q4+2*dz*q3,
-		  2*dx*q3-2*dy*q2,    2*dx*q4-2*dy*q1-4*dz*q2, 2*dx*q1+2*dy*q4-4*dz*q3,   2*dx*q2+2*dy*q3;
-
-  	// Napla = Jm.transpose() * fm;
-
-	/****************************
-	*	    TOT JACOBIAN		*
-	*****************************/
-	fm *= 0; 
-	f << fa(0), fa(1), fa(2), fm(0),fm(1),fm(2);		
-	Jtot << Ja(0,0),Ja(0,1),Ja(0,2),Ja(0,3),
-			Ja(1,0),Ja(1,1),Ja(1,2),Ja(1,3),
-			Ja(2,0),Ja(2,1),Ja(2,2),Ja(2,3),
-			Jm(0,0),Jm(0,1),Jm(0,2),Jm(0,3),
-			Jm(1,0),Jm(1,1),Jm(1,2),Jm(1,3),
-			Jm(2,0),Jm(2,1),Jm(2,2),Jm(2,3);
-
-	Napla = Jtot.transpose() * f;
-
-
-	/********************
-	*	    UPDATE 		*
-	*********************/
-	// qdot = 0.5*QxQ( qL,g ) - ( z_.betaVector(P)*Napla ); 
-	if (Napla.norm() > 1) 
-		qdot = 0.5 * QxQ(qL,g) - (z_.betaVector(P) *  (Napla/Napla.norm()));
-	else 
-		qdot = 0.5 * QxQ(qL,g) - (z_.betaVector(P) *  Napla);
-	
 	qL = qL + qdot / z_.sampleFreq; 
 	qL = qL /qL.norm();
-
 
 	Q_(P,0) = qL(0); 
 	Q_(P,1) = qL(1); 
 	Q_(P,2) = qL(2);  
 	Q_(P,3) = qL(3); 
+
 } 
 
 
@@ -548,6 +388,7 @@ void IMUGL::Magdwick(int P, int N)
 // =============================================================================================
 void IMUGL::initialOffset()
 {
+
 	// j = 2 because of the filter needs two different oreintation
 	for(int j=0; j<2; j++)
 	{
@@ -564,27 +405,25 @@ void IMUGL::initialOffset()
 			}
 
 			checkIMU();	
-			
+
 			// Compute the MadgwickFilter for the each IMUchains
-    		for (int ii = 0; ii < (int) IMUchains_.size(); ii++ )
+			for (int ii = 0; ii < (int) IMUchains_.size(); ii++ )
 			{
 				for (int jj=0; jj < (int) IMUchains_[ii].size() - 1; jj++)
-				{
-					Magdwick(IMUchains_[ii][jj],IMUchains_[ii][jj+1]); 
+				{	
+					MadgwickGeneral(IMUchains_[ii][jj],IMUchains_[ii][jj+1]); 					
 				}
 			}
-					
 
-			// Record odl Gyro value
+			// Record old Gyro value
 			Gyro_Old_ = Gyro_;
-			std::cout<<"step init world: "<< k+1 << "\r\n";
-			Q_off_= Q_;
+			std::cout<<"step init: "<< k+1 << "\r\n";
+			Q_joint_= Q_;
 		
-			usleep(1000);		
+			usleep(500);		
 		}	
 		
 		// Compute angles from quaternions
-		Q_joint_ = Q_;
 		Quat2AngleTot();
 
 		// Print IMUs_Angles offset
@@ -599,9 +438,8 @@ void IMUGL::initialOffset()
 		// Update quaternions offset
 		Q_off_ = Q_;
 	}
-
-
 }
+
 
 
 
@@ -611,15 +449,10 @@ void IMUGL::initialOffset()
 void IMUGL::computeAngles(Eigen::MatrixXd& out)
 {	
 
-	boost::posix_time::time_duration relTime;
-	boost::posix_time::ptime firstDataTime, absTime;
-	absTime = boost::posix_time::microsec_clock::local_time();
-
 
 	out.resize(p_.nIMU, 3);
 	// Read Data From PSoC
     readPSoC();
-	firstDataTime = boost::posix_time::microsec_clock::local_time();
 
     // Filter the gyroscope
 	for (int i=0; i<p_.nIMU; i++)
@@ -630,34 +463,27 @@ void IMUGL::computeAngles(Eigen::MatrixXd& out)
 	}
 
     checkIMU();
-	// Compute the MadgwickFilter for the each IMUchains
+    
+    // Compute the MadgwickFilter for the each IMUchains
 	for (int ii = 0; ii < (int) IMUchains_.size(); ii++ )
 	{
 		for (int jj=0; jj < (int) IMUchains_[ii].size() - 1; jj++)
 		{
-			Magdwick(IMUchains_[ii][jj],IMUchains_[ii][jj+1]); 
+			MadgwickGeneral(IMUchains_[ii][jj],IMUchains_[ii][jj+1]); 
+			z_.betaVector(ii) = z_.beta;
 		}
 	}
 
-    
 	// record Acc data every 100 samples
     Acc_Old_ = Acc_;
     Gyro_Old_ = Gyro_;
 
+
     offsetCorrector('s');
     Quat2AngleTot();
 
-
     out = IMUs_Angles_;
-
-	relTime = absTime - firstDataTime; 
-	// std::cout << "TIME: " << relTime << std::endl;
-
-
-	
 }
-
-
 
 
 
@@ -668,12 +494,12 @@ void IMUGL::computeAngles(Eigen::MatrixXd& out)
 void IMUGL::printIMUangles()
 {	
 	int k = 0;
-	std::cout<<"\n";	
-	for (int i = 0; i < (int)IMUchains_.size(); i++ )
+	std::cout<<"\n";
+	for (int i = 0; i < (int) IMUchains_.size(); i++ )
 	{
-		for (int j=0; j < (int)IMUchains_[i].size() - 1; j++)
+		for (int j=0; j < (int) IMUchains_[i].size() - 1; j++)
 		{
-			std::cout << "a " <<IMUchains_[i][j] << " " <<IMUchains_[i][j+1] << ":\t";
+			std::cout <<k<<  "  a: " <<IMUchains_[i][j] << " " <<IMUchains_[i][j+1] << ":\t";
 			std::cout << IMUs_Angles_(k,0)*(180/M_PI) << "\t" <<IMUs_Angles_(k,1)*(180/M_PI)<< "\t"<<IMUs_Angles_(k,2)*(180/M_PI)<<std::endl; 			
 			k++;   
 		}
@@ -699,6 +525,7 @@ void IMUGL::checkIMU()
 
 
 	Acc_Diff = (Acc_ - Acc_Old_);
+	
 	for(int k=0; k<p_.nIMU; k++)
 	{
 		IMU_n(0)  = Acc_Diff(k,0);  
@@ -707,8 +534,14 @@ void IMUGL::checkIMU()
 
 		if (IMU_n.norm() == 0) 
 		{
-			Acc_Faliure_(k) = 0; 
-			// std::cout<<"\r\nbad communication IMU: "<< k << "\r\n";
+			count_IMU_Failure_(k) += 1;
+			if(count_IMU_Failure_(k) == 30)
+			{
+				Acc_Faliure_(k) = 0; 
+				std::cout<<"\r\nbad communication IMU: "<< k  << "   cont: " << count_IMU_Failure_(k) << "\r\n";
+				count_IMU_Failure_(k) = 0;
+				// getchar();
+			}
 		} 
 		else 
 			Acc_Faliure_(k) = 1;
@@ -716,18 +549,13 @@ void IMUGL::checkIMU()
 		Current_Acc(0) = Acc_(k,0);
     	Current_Acc(1) = Acc_(k,1);
     	Current_Acc(2) = Acc_(k,2);
-    	if (Current_Acc.norm() > 1.15) 
+    	if (Current_Acc.norm() > 1.2) 
     	{
       		Acc_(k,0) = Acc_Old_(k,0);
       		Acc_(k,1) = Acc_Old_(k,1);
       		Acc_(k,2) = Acc_Old_(k,2);
 			
-			// Gyro_(k,0) = 0; 
-			// Gyro_(k,1) = 0; 
-			// Gyro_(k,2) = 0; 
-			// Gyro_ *=0;
-
-			z_.betaVector(k) = 0.1;
+			z_.betaVector(k) = 0;
 		}
 		else
 			z_.betaVector(k) = z_.beta;
@@ -778,114 +606,7 @@ void IMUGL::addChain( std::vector<int> a )
 	{
 		std::cout << " " << a[i];
 	}
-
-}
-
-
-void IMUGL::Update()
-{
-	float gx = Gyro_(0,0);
-	float gy = Gyro_(0,1);
-	float gz = Gyro_(0,2);
-
-	float ax = -Acc_(0,0);
-	float ay = -Acc_(0,1);
-	float az = -Acc_(0,2);
-
-	float mx = Mag_(0,0);
-	float my = Mag_(0,1);
-	float mz = Mag_(0,2);
-
-
-    float q1 = Quaternion(0), q2 = Quaternion(1), q3 = Quaternion(2), q4 = Quaternion(3);   // short name local variable for readability
-    float norm;
-    float hx, hy, _2bx, _2bz;
-    float s1, s2, s3, s4;
-    float qDot1, qDot2, qDot3, qDot4;
-
-    // Auxiliary variables to avoid repeated arithmetic
-    float _2q1mx;
-    float _2q1my;
-    float _2q1mz;
-    float _2q2mx;
-    float _4bx;
-    float _4bz;
-    float _2q1 = 2 * q1;
-    float _2q2 = 2 * q2;
-    float _2q3 = 2 * q3;
-    float _2q4 = 2 * q4;
-    float _2q1q3 = 2 * q1 * q3;
-    float _2q3q4 = 2 * q3 * q4;
-    float q1q1 = q1 * q1;
-    float q1q2 = q1 * q2;
-    float q1q3 = q1 * q3;
-    float q1q4 = q1 * q4;
-    float q2q2 = q2 * q2;
-    float q2q3 = q2 * q3;
-    float q2q4 = q2 * q4;
-    float q3q3 = q3 * q3;
-    float q3q4 = q3 * q4;
-    float q4q4 = q4 * q4;
-
-    // Normalise accelerometer measurement
-    norm = (float)sqrt(ax * ax + ay * ay + az * az);
-    if (norm == 0) return; // handle NaN
-    norm = 1 / norm;        // use reciprocal for division
-    ax *= norm;
-    ay *= norm;
-    az *= norm;
-    // Normalise magnetometer measurement
-    norm = (float)sqrt(mx * mx + my * my + mz * mz);
-    if (norm == 0) return; // handle NaN
-    norm = 1 / norm;        // use reciprocal for division
-    mx *= norm;
-    my *= norm;
-    mz *= norm;
-
-    // Reference direction of Earth's magnetic field
-    _2q1mx = 2 * q1 * mx;
-    _2q1my = 2 * q1 * my;
-    _2q1mz = 2 * q1 * mz;
-    _2q2mx = 2 * q2 * mx;
-    hx = mx * q1q1 - _2q1my * q4 + _2q1mz * q3 + mx * q2q2 + _2q2 * my * q3 + _2q2 * mz * q4 - mx * q3q3 - mx * q4q4;
-    hy = _2q1mx * q4 + my * q1q1 - _2q1mz * q2 + _2q2mx * q3 - my * q2q2 + my * q3q3 + _2q3 * mz * q4 - my * q4q4;
-    _2bx = (float)sqrt(hx * hx + hy * hy);
-    _2bz = -_2q1mx * q3 + _2q1my * q2 + mz * q1q1 + _2q2mx * q4 - mz * q2q2 + _2q3 * my * q4 - mz * q3q3 + mz * q4q4;
-    _4bx = 2 * _2bx;
-    _4bz = 2 * _2bz;
-
-    // Gradient decent algorithm corrective step
-    s1 = -_2q3 * (2 * q2q4 - _2q1q3 - ax) + _2q2 * (2 * q1q2 + _2q3q4 - ay) - _2bz * q3 * (_2bx * (0.5 - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - mx) + (-_2bx * q4 + _2bz * q2) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - my) + _2bx * q3 * (_2bx * (q1q3 + q2q4) + _2bz * (0.5 - q2q2 - q3q3) - mz);
-    s2 = _2q4 * (2 * q2q4 - _2q1q3 - ax) + _2q1 * (2 * q1q2 + _2q3q4 - ay) - 4 * q2 * (1 - 2 * q2q2 - 2 * q3q3 - az) + _2bz * q4 * (_2bx * (0.5 - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - mx) + (_2bx * q3 + _2bz * q1) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - my) + (_2bx * q4 - _4bz * q2) * (_2bx * (q1q3 + q2q4) + _2bz * (0.5 - q2q2 - q3q3) - mz);
-    s3 = -_2q1 * (2 * q2q4 - _2q1q3 - ax) + _2q4 * (2 * q1q2 + _2q3q4 - ay) - 4 * q3 * (1 - 2 * q2q2 - 2 * q3q3 - az) + (-_4bx * q3 - _2bz * q1) * (_2bx * (0.5 - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - mx) + (_2bx * q2 + _2bz * q4) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - my) + (_2bx * q1 - _4bz * q3) * (_2bx * (q1q3 + q2q4) + _2bz * (0.5 - q2q2 - q3q3) - mz);
-    s4 = _2q2 * (2 * q2q4 - _2q1q3 - ax) + _2q3 * (2 * q1q2 + _2q3q4 - ay) + (-_4bx * q4 + _2bz * q2) * (_2bx * (0.5 - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - mx) + (-_2bx * q1 + _2bz * q3) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - my) + _2bx * q2 * (_2bx * (q1q3 + q2q4) + _2bz * (0.5 - q2q2 - q3q3) - mz);
-    norm = 1 / (float)sqrt(s1 * s1 + s2 * s2 + s3 * s3 + s4 * s4);    // normalise step magnitude
-    s1 *= norm;
-    s2 *= norm;
-    s3 *= norm;
-    s4 *= norm;
-
-    float Beta = 2;
-    float SamplePeriod = 0.016;
-
-
-    // Compute rate of change of quaternion
-    qDot1 = 0.5 * (-q2 * gx - q3 * gy - q4 * gz) - Beta * s1;
-    qDot2 = 0.5 * (q1 * gx + q3 * gz - q4 * gy) - Beta * s2;
-    qDot3 = 0.5 * (q1 * gy - q2 * gz + q4 * gx) - Beta * s3;
-    qDot4 = 0.5 * (q1 * gz + q2 * gy - q3 * gx) - Beta * s4;
-
-
-    // Integrate to yield quaternion
-    q1 += (float) qDot1 * SamplePeriod;
-    q2 += (float) qDot2 * SamplePeriod;
-    q3 += (float) qDot3 * SamplePeriod;
-    q4 += (float) qDot4 * SamplePeriod;
-    norm = 1 / (float)sqrt(q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4);    // normalise quaternion
-    Quaternion(0) = q1 * norm;
-    Quaternion(1) = q2 * norm;
-    Quaternion(2) = q3 * norm;
-    Quaternion(3) = q4 * norm;
+	std::cout<<"\n";
 }
 
 
@@ -1009,76 +730,23 @@ Eigen::Vector3d IMUGL::Rot2Angle(Eigen::Matrix3d R_in)
 
 void IMUGL::Quat2AngleTot()
 {
-	float x, y, z, w;
-	float r21, r11, r31, r22, r23; 
 	for (int k=0; k<p_.nIMU; k++) 
 	{
- 		// IMUs_Angles_(k,0) = atan2(2*Q_joint_(k,1)*Q_joint_(k,2) - 2*Q_joint_(k,0)*Q_joint_(k,3), 2*Q_joint_(k,0)*Q_joint_(k,0) + 2*Q_joint_(k,1)*Q_joint_(k,1)-1); //YAW
+ 		IMUs_Angles_(k,0) = atan2(2*Q_joint_(k,1)*Q_joint_(k,2) - 2*Q_joint_(k,0)*Q_joint_(k,3), 2*Q_joint_(k,0)*Q_joint_(k,0) + 2*Q_joint_(k,1)*Q_joint_(k,1)-1); //YAW
 	 	// IMUs_Angles_(k,1) = -asin(2*Q_joint_(k,1)*Q_joint_(k,3) + 2*Q_joint_(k,0)*Q_joint_(k,2)); //PITCH
- 	 // 	IMUs_Angles_(k,2) = atan2(2*Q_joint_(k,2)*Q_joint_(k,3) - 2*Q_joint_(k,0)*Q_joint_(k,1), 2*Q_joint_(k,0)*Q_joint_(k,0) + 2*Q_joint_(k,3)*Q_joint_(k,3)-1); // ROLL
-	    x = Q_joint_(k,1);
-	    y = Q_joint_(k,2);
-	    z = Q_joint_(k,3);
-	    w = Q_joint_(k,0);
-	    r11 = 1 - 2*(y*y + z*z);
-	    r21 = 2*(x*y + w*z);
-	    r22 = 1 - 2*(x*x + z*z);
-	    r23 = 2*(y*z - w*x);
-	    r31 = 2*(x*z - w*y);
-
-	    //float num = std::abs(w) - std::abs(z);
-	    //float den = std::abs(w) + std::abs(z);
-	    //if( num/den > 0.2 )
-	    if (fabs(w) > fabs(z))
-	     {
-	     	IMUs_Angles_(k,0) = - atan2(r21, std::sqrt(r11*r11 + r31*r31)); //YAW
-			IMUs_Angles_(k,2) = - atan2(-r31, r11); //PITCH
-			IMUs_Angles_(k,1) = - atan2(-r23, r22); // ROLL
-	    	// yaw singularity
-		 	//IMUs_Angles_(k,0) = - asin(2*x*y + 2*z*w); //YAW
-			//IMUs_Angles_(k,2) = - atan2(2*x*w - 2*y*z, 1-2*x*x - 2*z*z); //PITCH
-			//IMUs_Angles_(k,1) = - atan2(2*y*w - 2*x*z, 1-2*y*y - 2*z*z); // ROLL
-	    	
-	    	// pitch singularity
-			// IMUs_Angles_(k,0) = atan2(2*x*y - 2*w*z, 2*w*w + 2*x*x-1); //YAW
-	 		// IMUs_Angles_(k,1) = -asin(2*x*z + 2*w*y); //PITCH
- 	 	// 	IMUs_Angles_(k,2) = atan2(2*y*z - 2*w*x, 2*w*w + 2*z*z-1); // ROLL
-		//	IMUs_Angles_old_ = IMUs_Angles_;
-	     }
-	     else
-	     {
-	     	IMUs_Angles_(k,0) = - atan2(r21, -std::sqrt(r11*r11 + r31*r31)); //YAW
-			IMUs_Angles_(k,2) = - atan2(r31, -r11); //PITCH
-			IMUs_Angles_(k,1) = - atan2(r23, -r22); // ROLL
-	  //   	IMUs_Angles_(k,0) = IMUs_Angles_old_(k,0);
-			// IMUs_Angles_(k,2) = IMUs_Angles_old_(k,2);
-			// IMUs_Angles_(k,1) = IMUs_Angles_old_(k,1);
-	     }
-
-
-		if(k==0)
-		{	
-		    // std::cout<<"num/den   " << num/den << std::endl;
-			std::cout << "w: " << w << "\t\tx: " << x << "\t\ty: " << y << "\t\tz: " << z << std::endl;
-   		}
- //   	IMUs_Angles_(k,0) = std::atan2(2.0f * (w * z + x * y),1.0f - 2.0f * (y * y + z * z)); //YAW
-	// IMUs_Angles_(k,1) = std::asin(std::max(-1.0f, std::min(1.0f, 2.0f * (w * y - z * x))));
- //   	IMUs_Angles_(k,2) = std::atan2(2.0f*(w*x +y*z),1.0f - 2.0f*(x * x + y * y));
-   }
+	 	IMUs_Angles_(k,1) = -atan(   (2*Q_joint_(k,1)*Q_joint_(k,3) + 2*Q_joint_(k,0)*Q_joint_(k,2)) / (sqrt(1-(2*Q_joint_(k,1)*Q_joint_(k,3) + 2*Q_joint_(k,2)*Q_joint_(k,0)) * (2*Q_joint_(k,1)*Q_joint_(k,3) + 2*Q_joint_(k,2)*Q_joint_(k,0) )))); //PITCH
+ 	 	IMUs_Angles_(k,2) = atan2(2*Q_joint_(k,2)*Q_joint_(k,3) - 2*Q_joint_(k,0)*Q_joint_(k,1), 2*Q_joint_(k,0)*Q_joint_(k,0) + 2*Q_joint_(k,3)*Q_joint_(k,3)-1); // ROLL
+    }
 }
-
 
 void IMUGL::offsetCorrector(char choice)
 {
   if (choice == 'n')
-  {
     Q_joint_ = Q_;
-  }
   if (choice == 's')
   { 
     for (int k=0; k < p_.nIMU; ++k)
     {
-
       Q_joint_(k,0) = Q_off_(k,0)*Q_(k,0) - (-Q_off_(k,1)*Q_(k,1) - Q_off_(k,2)*Q_(k,2) - Q_off_(k,3)*Q_(k,3));
       Q_joint_(k,1) = Q_off_(k,0)*Q_(k,1) - Q_off_(k,1)*Q_(k,0) - Q_off_(k,2)*Q_(k,3) + Q_off_(k,3)*Q_(k,2);
       Q_joint_(k,2) = Q_off_(k,0)*Q_(k,2) - Q_off_(k,2)*Q_(k,0) - Q_off_(k,3)*Q_(k,1) + Q_off_(k,1)*Q_(k,3);
@@ -1088,4 +756,30 @@ void IMUGL::offsetCorrector(char choice)
 }
 
 
+void IMUGL::AngleTot2Quat()
+{
+	Eigen::Vector3d rpy;
+	Eigen::Vector4d q;
+	Eigen::Matrix3d R;
+	for (int k=0; k < p_.nIMU; ++k)
+    {
+    	// switch (k)
+    	// {
+    	// 	case 0: case 1: case 3: case 4: case 6: case 7: case 9: case 10: case 12: case 13:
+    	// 	  IMUs_Angles_(k,0) = 0;
+    	// 	  break;
+    	// 	default: 
+    	// 	  break;	
+    	// }
 
+    	rpy << IMUs_Angles_(k,0),IMUs_Angles_(k,1),IMUs_Angles_(k,2);
+    	rpy = - rpy*(180/M_PI);
+    	R = rot (rpy(2), rpy(1), rpy(0));
+    	q = Rot2Quat(R);
+    	q = q/q.norm();
+    	Q_joint_(k,0) = q(0);
+    	Q_joint_(k,1) = q(1);
+    	Q_joint_(k,2) = q(2);
+    	Q_joint_(k,3) = q(3);
+    }
+}

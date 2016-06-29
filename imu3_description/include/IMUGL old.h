@@ -35,18 +35,15 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/asio/serial_port.hpp> 
-#include <boost/filesystem.hpp>
-#include <boost/bind.hpp>
 #include <eigen3/Eigen/Eigen>
 #include <eigen3/Eigen/SVD>
-
 
 
 #define _DEBUG_DATA_BUFFER_ 0
 #define _DEBUG_REAL_DATA_   1
 
 // # step for compute offset angles
-#define _OFFSET_STEP_      100
+#define _OFFSET_STEP_      90
 
 
 // sgn function
@@ -91,25 +88,16 @@ public:
     Eigen::MatrixXd Gyro_;
     Eigen::MatrixXd Gyro_Old_;
     Eigen::MatrixXd Gyro_Bias_;
-    Eigen::MatrixXd Mag_;
-    Eigen::MatrixXd COM_;
-    Eigen::MatrixXd MagCal_;
 
     Eigen::MatrixXd IMUs_Angles_;
-    Eigen::MatrixXd IMUs_Angles_old_;
     Eigen::MatrixXd Q_; 
-    Eigen::MatrixXd Q_world_; 
     Eigen::MatrixXd Q_off_; 
     Eigen::MatrixXd Q_joint_;
 
-    //================================================================     Init PSoC
+    //================================================================     InitPSoC
     void initPSoC();
     psocVariables p_;
     
-    //================================================================     Init Compass
-    void initCompass(std::string path);
-    Eigen::MatrixXf cf_; //corrector factors
-
     //================================================================     StopPSoC
     void stopPSoC();
     
@@ -117,7 +105,7 @@ public:
     void readPSoC();
 
     //================================================================     MadgwickGeneral
-    void Magdwick( int P, int N);
+    void MadgwickGeneral( int P, int N );
 
     //================================================================     InitialOffset
     void initialOffset();
@@ -136,30 +124,7 @@ public:
 
     //================================================================     PrintIMUangles
     void printIMUangles();
-
-    void Update();
-    Eigen::Vector4d Quaternion;
-
-
-private:
-
-    boost::asio::serial_port* serialPort_;
-    boost::asio::io_service ioService_;
-    int sizeBuffer_;
-    uint8_t* dataBuffer_; 
-
-
-    //================================================================     CheckIMU 
-    void checkIMU();
-    Eigen::VectorXd Acc_Faliure_;
-
-    //================================================================     RelativeQuaternions 
-    void relativeQuaternions();
-
-    //================================================================     RelativeQuaternions 
-    void magCorrector();
     
-
     //================================================================     Useful Functions 
     Eigen::Matrix3d rotX( float x );
     Eigen::Matrix3d rotY( float y );
@@ -174,8 +139,26 @@ private:
     Eigen::Vector3d Rot2Angle( Eigen::Matrix3d R_in );
     void Quat2AngleTot();
     void offsetCorrector(char c);
+    void AngleTot2Quat();
+    
 
+private:
+
+    boost::asio::serial_port* serialPort_;
+    boost::asio::io_service ioService_;
+    int sizeBuffer_;
+    uint8_t* dataBuffer_; 
+
+
+    //================================================================     CheckIMU 
+    void checkIMU();
+    Eigen::VectorXd Acc_Faliure_;
+    Eigen::VectorXd count_IMU_Failure_;
+    
+
+  
 };
+
 
 
 

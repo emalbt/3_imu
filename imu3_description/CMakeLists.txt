@@ -6,8 +6,9 @@ find_package(orocos_kdl REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
+  roslib
   std_msgs
-
+  nlopt
   cv_bridge
   image_transport 
   std_srvs
@@ -47,7 +48,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 
 
-link_directories(${catkin_LIBRARY_DIRS})
+link_directories(${catkin_LIBRARY_DIRS} $ENV{HOME}/install/lib)
 
 
 add_definitions(-std=c++11 --all-warnings -O3) 
@@ -86,7 +87,7 @@ catkin_package(
 ###########
 
 
-include_directories(${catkin_INCLUDE_DIRS} include)
+include_directories(${catkin_INCLUDE_DIRS} include $ENV{HOME}/install/include)
 
 
 
@@ -94,7 +95,15 @@ include_directories(${catkin_INCLUDE_DIRS} include)
 add_executable(imu3_node src/main.cpp src/IMUGL.cpp )
 
 ## Add cmake target dependencies of the executable
-## same as for the library above
-add_dependencies(imu3_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+## same as for the library above 
+add_dependencies(imu3_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} )
 # Specify libraries to link a library or executable target against
-target_link_libraries(imu3_node ${catkin_LIBRARIES} )
+target_link_libraries(imu3_node ${catkin_LIBRARIES} $ENV{HOME}/install/lib nlopt m nlopt_cxx )
+# target_link_libraries(imu3_node ${catkin_LIBRARIES}  nlopt  m)
+
+# # Declare a C++ executable
+add_executable(imu3_calibration_node src/mag_calibration/main_mag_calibration.cpp  src/mag_calibration/IMUGL_mag_calibration.cpp)
+# ## Add cmake target dependencies of the executable same as for the library above
+add_dependencies(imu3_calibration_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} )
+# # Specify libraries to link a library or executable target against
+target_link_libraries(imu3_calibration_node ${catkin_LIBRARIES} )
