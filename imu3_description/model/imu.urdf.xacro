@@ -14,9 +14,9 @@
 			<origin xyz="${position}" rpy="${orientation}" />
 			<parent link="${parent}"/>
 			<child link="${name}_first_link_roll"/>
-					<axis xyz="1 0 0" />
-				<limit lower="${0}" upper="${2*pi}" effort="${effort}" velocity="${velocity}"/>
-			</joint>
+			<axis xyz="1 0 0" />
+			<limit lower="${0}" upper="${2*pi}" effort="${effort}" velocity="${velocity}"/>
+		</joint>
 		<link name="${name}_first_link_roll">
 		</link>
 
@@ -130,7 +130,7 @@
 
 
 
-	</xacro:macro> <!-- end xacro for one IMU -->
+	</xacro:macro> <!-- end xacro for 3 IMU -->
 
 
 

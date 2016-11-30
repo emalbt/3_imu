@@ -6,11 +6,10 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /RobotModel1/Links1
         - /TF1
         - /TF1/Frames1
       Splitter Ratio: 0.81686
-    Tree Height: 359
+    Tree Height: 747
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -61,315 +60,41 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        manikin_arm_left_bicep_X_link:
+        imu_first_link_pitch:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        manikin_arm_left_bicep_Y_link:
+        imu_first_link_roll:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        manikin_arm_left_bicep_Z_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_arm_left_bicep_visual_link:
+        imu_first_link_yaw:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        manikin_arm_left_elbow_link:
+        imu_second_link_pitch:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        imu_second_link_roll:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        imu_second_link_yaw:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        manikin_arm_left_forearm_X_link:
+        imu_third_link_pitch:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        manikin_arm_left_forearm_Y_link:
+        imu_third_link_roll:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        manikin_arm_left_forearm_Z_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_arm_left_forearm_visual_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_arm_left_hand_X_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_arm_left_hand_Y_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_arm_left_hand_Z_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_arm_left_hand_visual_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_arm_left_sholder_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_arm_left_sholder_real_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_arm_left_wrist_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_arm_right_bicep_X_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_arm_right_bicep_Y_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_arm_right_bicep_Z_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_arm_right_bicep_visual_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_arm_right_elbow_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_arm_right_forearm_X_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_arm_right_forearm_Y_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_arm_right_forearm_Z_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_arm_right_forearm_visual_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_arm_right_hand_X_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_arm_right_hand_Y_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_arm_right_hand_Z_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_arm_right_hand_visual_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_arm_right_sholder_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_arm_right_sholder_real_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_arm_right_wrist_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_chest_X_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_chest_Y_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_chest_Z_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_chest_visual_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_head_X_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_head_Y_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_head_Z_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_head_visual_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_hip_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_leg_left_ankle_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_leg_left_foot_X_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_leg_left_foot_Z_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_leg_left_foot_visual_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_leg_left_haunch_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_leg_left_knee_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_leg_left_shin_X_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_leg_left_shin_Y_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_leg_left_shin_Z_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_leg_left_shin_visual_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_leg_left_thigh_X_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_leg_left_thigh_Y_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_leg_left_thigh_Z_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_leg_left_thigh_visual_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_leg_right_ankle_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_leg_right_foot_X_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_leg_right_foot_Z_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_leg_right_foot_visual_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_leg_right_haunch_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_leg_right_knee_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_leg_right_shin_X_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_leg_right_shin_Y_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_leg_right_shin_Z_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_leg_right_shin_visual_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_leg_right_thigh_X_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_leg_right_thigh_Y_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_leg_right_thigh_Z_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        manikin_leg_right_thigh_visual_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_neck_visual_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        manikin_waist_link:
+        imu_third_link_yaw:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -389,233 +114,43 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        manikin_arm_left_bicep_X_link:
-          Value: false
-        manikin_arm_left_bicep_Y_link:
-          Value: false
-        manikin_arm_left_bicep_Z_link:
-          Value: false
-        manikin_arm_left_bicep_visual_link:
+        imu_first_link_pitch:
           Value: true
-        manikin_arm_left_elbow_link:
-          Value: false
-        manikin_arm_left_forearm_X_link:
-          Value: false
-        manikin_arm_left_forearm_Y_link:
-          Value: false
-        manikin_arm_left_forearm_Z_link:
-          Value: false
-        manikin_arm_left_forearm_visual_link:
-          Value: false
-        manikin_arm_left_hand_X_link:
-          Value: false
-        manikin_arm_left_hand_Y_link:
-          Value: false
-        manikin_arm_left_hand_Z_link:
-          Value: false
-        manikin_arm_left_hand_visual_link:
-          Value: false
-        manikin_arm_left_sholder_link:
-          Value: false
-        manikin_arm_left_sholder_real_link:
+        imu_first_link_roll:
           Value: true
-        manikin_arm_left_wrist_link:
-          Value: false
-        manikin_arm_right_bicep_X_link:
-          Value: false
-        manikin_arm_right_bicep_Y_link:
-          Value: false
-        manikin_arm_right_bicep_Z_link:
-          Value: false
-        manikin_arm_right_bicep_visual_link:
-          Value: false
-        manikin_arm_right_elbow_link:
-          Value: false
-        manikin_arm_right_forearm_X_link:
-          Value: false
-        manikin_arm_right_forearm_Y_link:
-          Value: false
-        manikin_arm_right_forearm_Z_link:
-          Value: false
-        manikin_arm_right_forearm_visual_link:
-          Value: false
-        manikin_arm_right_hand_X_link:
-          Value: false
-        manikin_arm_right_hand_Y_link:
-          Value: false
-        manikin_arm_right_hand_Z_link:
-          Value: false
-        manikin_arm_right_hand_visual_link:
-          Value: false
-        manikin_arm_right_sholder_link:
-          Value: false
-        manikin_arm_right_sholder_real_link:
+        imu_first_link_yaw:
           Value: true
-        manikin_arm_right_wrist_link:
-          Value: false
-        manikin_chest_X_link:
-          Value: false
-        manikin_chest_Y_link:
-          Value: false
-        manikin_chest_Z_link:
-          Value: false
-        manikin_chest_visual_link:
-          Value: false
-        manikin_head_X_link:
-          Value: false
-        manikin_head_Y_link:
-          Value: false
-        manikin_head_Z_link:
-          Value: false
-        manikin_head_visual_link:
-          Value: false
-        manikin_hip_link:
-          Value: false
-        manikin_leg_left_ankle_link:
-          Value: false
-        manikin_leg_left_foot_X_link:
-          Value: false
-        manikin_leg_left_foot_Z_link:
-          Value: false
-        manikin_leg_left_foot_visual_link:
-          Value: false
-        manikin_leg_left_haunch_link:
-          Value: false
-        manikin_leg_left_knee_link:
-          Value: false
-        manikin_leg_left_shin_X_link:
-          Value: false
-        manikin_leg_left_shin_Y_link:
-          Value: false
-        manikin_leg_left_shin_Z_link:
-          Value: false
-        manikin_leg_left_shin_visual_link:
-          Value: false
-        manikin_leg_left_thigh_X_link:
-          Value: false
-        manikin_leg_left_thigh_Y_link:
-          Value: false
-        manikin_leg_left_thigh_Z_link:
-          Value: false
-        manikin_leg_left_thigh_visual_link:
-          Value: false
-        manikin_leg_right_ankle_link:
-          Value: false
-        manikin_leg_right_foot_X_link:
-          Value: false
-        manikin_leg_right_foot_Z_link:
-          Value: false
-        manikin_leg_right_foot_visual_link:
-          Value: false
-        manikin_leg_right_haunch_link:
-          Value: false
-        manikin_leg_right_knee_link:
-          Value: false
-        manikin_leg_right_shin_X_link:
-          Value: false
-        manikin_leg_right_shin_Y_link:
-          Value: false
-        manikin_leg_right_shin_Z_link:
-          Value: false
-        manikin_leg_right_shin_visual_link:
-          Value: false
-        manikin_leg_right_thigh_X_link:
-          Value: false
-        manikin_leg_right_thigh_Y_link:
-          Value: false
-        manikin_leg_right_thigh_Z_link:
-          Value: false
-        manikin_leg_right_thigh_visual_link:
-          Value: false
-        manikin_neck_visual_link:
-          Value: false
-        manikin_waist_link:
-          Value: false
+        imu_second_link_pitch:
+          Value: true
+        imu_second_link_roll:
+          Value: true
+        imu_second_link_yaw:
+          Value: true
+        imu_third_link_pitch:
+          Value: true
+        imu_third_link_roll:
+          Value: true
+        imu_third_link_yaw:
+          Value: true
         world:
           Value: true
-      Marker Scale: 1
+      Marker Scale: 0.35
       Name: TF
-      Show Arrows: true
+      Show Arrows: false
       Show Axes: true
       Show Names: false
       Tree:
         world:
-          manikin_waist_link:
-            manikin_chest_X_link:
-              manikin_chest_Y_link:
-                manikin_chest_Z_link:
-                  manikin_chest_visual_link:
-                    manikin_arm_left_sholder_link:
-                      manikin_arm_left_sholder_real_link:
-                        manikin_arm_left_bicep_X_link:
-                          manikin_arm_left_bicep_Y_link:
-                            manikin_arm_left_bicep_Z_link:
-                              manikin_arm_left_bicep_visual_link:
-                                manikin_arm_left_elbow_link:
-                                  manikin_arm_left_forearm_X_link:
-                                    manikin_arm_left_forearm_Y_link:
-                                      manikin_arm_left_forearm_Z_link:
-                                        manikin_arm_left_forearm_visual_link:
-                                          manikin_arm_left_wrist_link:
-                                            manikin_arm_left_hand_X_link:
-                                              manikin_arm_left_hand_Y_link:
-                                                manikin_arm_left_hand_Z_link:
-                                                  manikin_arm_left_hand_visual_link:
-                                                    {}
-                    manikin_arm_right_sholder_link:
-                      manikin_arm_right_sholder_real_link:
-                        manikin_arm_right_bicep_X_link:
-                          manikin_arm_right_bicep_Y_link:
-                            manikin_arm_right_bicep_Z_link:
-                              manikin_arm_right_bicep_visual_link:
-                                manikin_arm_right_elbow_link:
-                                  manikin_arm_right_forearm_X_link:
-                                    manikin_arm_right_forearm_Y_link:
-                                      manikin_arm_right_forearm_Z_link:
-                                        manikin_arm_right_forearm_visual_link:
-                                          manikin_arm_right_wrist_link:
-                                            manikin_arm_right_hand_X_link:
-                                              manikin_arm_right_hand_Y_link:
-                                                manikin_arm_right_hand_Z_link:
-                                                  manikin_arm_right_hand_visual_link:
-                                                    {}
-                    manikin_neck_visual_link:
-                      manikin_head_X_link:
-                        manikin_head_Y_link:
-                          manikin_head_Z_link:
-                            manikin_head_visual_link:
-                              {}
-            manikin_hip_link:
-              manikin_leg_left_haunch_link:
-                manikin_leg_left_thigh_X_link:
-                  manikin_leg_left_thigh_Y_link:
-                    manikin_leg_left_thigh_Z_link:
-                      manikin_leg_left_thigh_visual_link:
-                        manikin_leg_left_knee_link:
-                          manikin_leg_left_shin_X_link:
-                            manikin_leg_left_shin_Y_link:
-                              manikin_leg_left_shin_Z_link:
-                                manikin_leg_left_shin_visual_link:
-                                  manikin_leg_left_ankle_link:
-                                    manikin_leg_left_foot_X_link:
-                                      manikin_leg_left_foot_Z_link:
-                                        manikin_leg_left_foot_visual_link:
-                                          {}
-              manikin_leg_right_haunch_link:
-                manikin_leg_right_thigh_X_link:
-                  manikin_leg_right_thigh_Y_link:
-                    manikin_leg_right_thigh_Z_link:
-                      manikin_leg_right_thigh_visual_link:
-                        manikin_leg_right_knee_link:
-                          manikin_leg_right_shin_X_link:
-                            manikin_leg_right_shin_Y_link:
-                              manikin_leg_right_shin_Z_link:
-                                manikin_leg_right_shin_visual_link:
-                                  manikin_leg_right_ankle_link:
-                                    manikin_leg_right_foot_X_link:
-                                      manikin_leg_right_foot_Z_link:
-                                        manikin_leg_right_foot_visual_link:
-                                          {}
+          imu_first_link_roll:
+            imu_first_link_pitch:
+              imu_first_link_yaw:
+                imu_second_link_roll:
+                  imu_second_link_pitch:
+                    imu_second_link_yaw:
+                      imu_third_link_roll:
+                        imu_third_link_pitch:
+                          imu_third_link_yaw:
+                            {}
       Update Interval: 0
       Value: true
   Enabled: true
@@ -642,30 +177,30 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 3.60364
+      Distance: 0.419945
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.392797
-        Y: -0.430563
-        Z: 1.79357
+        X: 0.283699
+        Y: 0.0588721
+        Z: 0.0415317
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.2548
+      Pitch: 0.2198
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.46815
+      Yaw: 0.0231557
     Saved: ~
 Window Geometry:
   Displays:
-    collapsed: true
+    collapsed: false
   Height: 1028
-  Hide Left Dock: true
+  Hide Left Dock: false
   Hide Right Dock: true
-  QMainWindow State: 000000ff00000000fd00000004000000000000016a0000037afc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000006400fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c00610079007300000000280000037a000000dd00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000010f0000037afc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a0056006900650077007300000000280000037a000000b000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000003ab0000003efc0100000002fb0000000800540069006d00650100000000000003ab000002f600fffffffb0000000800540069006d00650100000000000004500000000000000000000003ab0000037a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000004000000000000016a0000037afc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000006400fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c00610079007301000000280000037a000000dd00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000010f0000037afc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a0056006900650077007300000000280000037a000000b000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000003ab0000003efc0100000002fb0000000800540069006d00650100000000000003ab000002f600fffffffb0000000800540069006d006501000000000000045000000000000000000000023b0000037a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -675,5 +210,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 939
-  X: 31
+  X: 49
   Y: 14
