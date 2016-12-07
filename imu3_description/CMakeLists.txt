@@ -17,7 +17,7 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 
 
 catkin_package(
-  CATKIN_DEPENDS message_runtime
+  CATKIN_DEPENDS 
 )
 
 
